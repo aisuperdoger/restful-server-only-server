@@ -38,7 +38,7 @@ workspace/images
 workspace/videos
 workspace/*.onnx
 workspace/*.trtmodel
-# workspace/*
+workspace/*
 src/python_scripts/yolov5_classify_life_jacket/weights
 
 .vscode
