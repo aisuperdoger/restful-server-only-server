@@ -167,11 +167,14 @@ Json::Value LogicalController::detectImage(cv::Mat image_data, string labels = "
 		item["class_name"] = cocolabels[box.class_label];
 		boxarray_json.append(item);
 	}
-	return success(boxarray_json);
+
+
+	return boxarray_json;
 }
 
 string LogicalController::yoloDetectImage(std::shared_ptr<Session> session, string labels = "person")
 {
+
 	string body = session->request.body;
 	int i1 = 0;
 	i1 = body.find("\r\n");
@@ -296,6 +299,7 @@ Json::Value LogicalController::yoloDetectVideo(std::shared_ptr<Session> session,
 
 	cv::Mat frame;
 	Json::Value resultJson;
+	int baseline = 0;
 	while (1)
 	{
 		cap >> frame;
@@ -305,9 +309,18 @@ Json::Value LogicalController::yoloDetectVideo(std::shared_ptr<Session> session,
 		resultJson = detectImage(frame, labels);
 
 		// 如果框，就给给frame画框
-		for (auto &box : resultJson["data"])
+		baseline = 0;
+		for (auto &box : resultJson)
 		{
+			// cv::rectangle(frame, cv::Point(box["left"].asInt(), box["top"].asInt()), cv::Point(box["right"].asInt(), box["bottom"].asInt()), cv::Scalar(0, 0, 255));
+			
+			string label_string = box["class_name"].asString() + " " + box["confidence"].asString();
 			cv::rectangle(frame, cv::Point(box["left"].asInt(), box["top"].asInt()), cv::Point(box["right"].asInt(), box["bottom"].asInt()), cv::Scalar(0, 0, 255));
+			cv::Size text_size = cv::getTextSize(label_string, FONT_HERSHEY_SIMPLEX, 0.4, 1, &baseline);
+			cv::rectangle(frame, cv::Point(box["left"].asInt(), box["top"].asInt() - text_size.height - baseline), cv::Point(box["left"].asInt() + text_size.width, box["top"].asInt()), cv::Scalar(255, 0, 255), -1);
+
+			cv::putText(frame, label_string, cv::Point(box["left"].asInt(), box["top"].asInt() - baseline), FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(0, 255, 255));
+				
 			// cv::rectangle(frame, cv::Point(int(box["left"]), 400), cv::Point(450, 450), cv::Scalar(0, 0, 255));
 			// std::cout << typeid(box["left"].asInt()).name() << std::endl;
 			// cap << frame;
