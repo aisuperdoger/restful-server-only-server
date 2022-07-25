@@ -366,13 +366,13 @@ Json::Value LogicalController::putVideo(const Json::Value &param)
 	auto session = get_current_session(); // 返回一个会话用于处理链接。好像只能同时开启32个会话，因为每个会话由一个线程维护，而我们只开启了32个线程。
 
 	// 获取视频开始位置
-	string body = session->request.body;
-	int i1 = body.find("\r\n");
-	i1 = body.find("\r\n", i1 + 2) + 4;
+	// string body = session->request.body;
+	// int i1 = body.find("\r\n");
+	// i1 = body.find("\r\n", i1 + 2) + 4;
 
-	// std::cout<<session->request.body.substr(i1,1000)<<std::endl;
-	iLogger::save_file("base_decode.mp4", session->request.body.substr(i1)); // 保存mp4视频
-	std::cout << "已保存MP4视频" << std::endl;
+	// // std::cout<<session->request.body.substr(i1,1000)<<std::endl;
+	// iLogger::save_file("base_decode.mp4", session->request.body.substr(i1)); // 保存mp4视频
+	// std::cout << "已保存MP4视频" << std::endl;
 
 	return success();
 }
