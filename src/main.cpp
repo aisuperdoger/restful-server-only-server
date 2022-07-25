@@ -52,6 +52,7 @@ public:
 		if (image_input.empty())
 		{
 			INFOE("Image is empty.");
+			INFOE("请检查发送格式或发送内容是否正确");
 			return false;
 		}
 		boxarray = infer_->commit(image_input).get();
@@ -139,7 +140,7 @@ public:
 private:
 	shared_ptr<InferInstance> infer_instance_;
 	Json::Value detectImage(cv::Mat image_data, string labels);
-	string yoloDetectImage(std::shared_ptr<Session> session, string labels);
+	Json::Value yoloDetectImage(std::shared_ptr<Session> session, string labels);
 	Json::Value yoloDetectVideo(std::shared_ptr<Session> session, string labels);
 };
 
@@ -168,27 +169,47 @@ Json::Value LogicalController::detectImage(cv::Mat image_data, string labels = "
 		boxarray_json.append(item);
 	}
 
-
 	return boxarray_json;
 }
 
-string LogicalController::yoloDetectImage(std::shared_ptr<Session> session, string labels = "person")
+Json::Value LogicalController::yoloDetectImage(std::shared_ptr<Session> session, string labels = "person")
 {
 
 	string body = session->request.body;
 	int i1 = 0;
-	i1 = body.find("\r\n");
-	i1 = body.find("\r\n", i1 + 2);
+	// i1 = body.find("\r\n");
 	// i1 = body.find("\r\n", i1 + 2);
-	i1 = body.find("\r\n", i1 + 2) + 4;
+	// i1 = body.find("\r\n", i1 + 2);
+	i1 = body.find("\r\n\r\n") + 4;  // 这是个bug，如果发送过来的信息，不是这个格式就识别不了，甚至导致程序崩溃
+	if(i1==0){
+		// INFOE("请检查发送格式或发送内容是否正确");
+		return failure("请检查发送格式或发送内容是否正确");
+	}
+	
+	
+	// std::cout<<body.substr(i1,1000)<<std::endl;
 
-	iLogger::save_file("base_decode.jpg", session->request.body.substr(i1)); // 保存图片
-	auto image = cv::imread("./base_decode.jpg");
+	string result_path ="";
+	for (unsigned long long i = 0; i <= 18446744073709551615; i++)
+	{
+		result_path = "images/" + labels + to_string(i) + ".jpg";
+		
+		if (access(result_path.c_str(), F_OK) != 0)
+		{
+			break;
+		}
+	}
+
+
+	iLogger::save_file(result_path, session->request.body.substr(i1)); // 保存图片
+	
+	
+	auto image = cv::imread(result_path); 
 
 	SimpleYolo::BoxArray boxarray;
 	if (!this->infer_instance_->inference(image, boxarray))
-		// return failure("Server error1");
-		return "Server error1";
+		return failure("Server error1");
+		// return "Server error1";
 
 	const char **target_labels = nullptr;
 	if (labels == "person")
@@ -237,19 +258,20 @@ string LogicalController::yoloDetectImage(std::shared_ptr<Session> session, stri
 	}
 
 	// cv::imwrite("base_decode.jpg", image);
-	time_t curr_time;
-	time(&curr_time);
-	char *curr_time2 = asctime(localtime(&curr_time));
-	regex pattern1(" ");
-	regex pattern2("\n");
-	string s1 = regex_replace(regex_replace(curr_time2, pattern1, "_"), pattern2, "");
 
-	string result_path = "images/" + labels + "/image" + s1 + ".jpg";
+
+	
 	cv::imwrite(result_path, image);
 
 	// cv::imwrite("base_decode.jpg", image);
 	// return "http://127.0.0.1:8090/static/" + result_path;
-	return " http://test1980images.vaiwan.com/static/" + result_path;
+
+	Json::Value ret;
+	ret["status"] = "success";
+	ret["url"] = "http://test1980images.vaiwan.com/static/" + result_path;
+	ret["time"] = iLogger::time_now();
+	ret["data"] = boxarray_json;
+	return ret;
 }
 
 Json::Value LogicalController::yoloDetectVideo(std::shared_ptr<Session> session, string labels = "person")
@@ -288,7 +310,7 @@ Json::Value LogicalController::yoloDetectVideo(std::shared_ptr<Session> session,
 	regex pattern1(" ");
 	regex pattern2("\n");
 	string s1 = regex_replace(regex_replace(curr_time2, pattern1, "_"), pattern2, "");
-	string result_video_path = "videos/coco/video_"+s1+".mp4";
+	string result_video_path = "videos/coco/video_" + s1 + ".mp4";
 
 	cv::VideoWriter w_cap(result_video_path, fourcc, rate, cv::Size(width, height));
 	/*自定义输出视频的尺寸，需要将读取的视频帧尺寸进行变换，下文使用的resize函数完成*/
@@ -313,14 +335,14 @@ Json::Value LogicalController::yoloDetectVideo(std::shared_ptr<Session> session,
 		for (auto &box : resultJson)
 		{
 			// cv::rectangle(frame, cv::Point(box["left"].asInt(), box["top"].asInt()), cv::Point(box["right"].asInt(), box["bottom"].asInt()), cv::Scalar(0, 0, 255));
-			
+
 			string label_string = box["class_name"].asString() + " " + box["confidence"].asString();
 			cv::rectangle(frame, cv::Point(box["left"].asInt(), box["top"].asInt()), cv::Point(box["right"].asInt(), box["bottom"].asInt()), cv::Scalar(0, 0, 255));
 			cv::Size text_size = cv::getTextSize(label_string, FONT_HERSHEY_SIMPLEX, 0.4, 1, &baseline);
 			cv::rectangle(frame, cv::Point(box["left"].asInt(), box["top"].asInt() - text_size.height - baseline), cv::Point(box["left"].asInt() + text_size.width, box["top"].asInt()), cv::Scalar(255, 0, 255), -1);
 
 			cv::putText(frame, label_string, cv::Point(box["left"].asInt(), box["top"].asInt() - baseline), FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(0, 255, 255));
-				
+
 			// cv::rectangle(frame, cv::Point(int(box["left"]), 400), cv::Point(450, 450), cv::Scalar(0, 0, 255));
 			// std::cout << typeid(box["left"].asInt()).name() << std::endl;
 			// cap << frame;
@@ -336,9 +358,7 @@ Json::Value LogicalController::yoloDetectVideo(std::shared_ptr<Session> session,
 	// Json::Value resultVideoJson;
 	// resultVideoJson["url"] = " http://test1980images.vaiwan.com/static/re_video.mp4";
 
-	
-
-	return "http://test1980images.vaiwan.com/static/"+result_video_path;
+	return "http://test1980images.vaiwan.com/static/" + result_video_path;
 }
 
 Json::Value LogicalController::putVideo(const Json::Value &param)
@@ -406,7 +426,7 @@ Json::Value LogicalController::detectBase64Image(const Json::Value &param)
 	// Json::Value boxarray_json(Json::arrayValue);
 	// boxarray_json = yoloDetectImage(session, "coco");
 
-	string result_path = yoloDetectImage(session, "coco");
+	// string result_path = yoloDetectImage(session, "coco");
 
 	// cv::imwrite("base_decode.jpg", image);
 	// time_t curr_time;
@@ -419,7 +439,8 @@ Json::Value LogicalController::detectBase64Image(const Json::Value &param)
 	// cv::imwrite("./images/detectBase64Image/image" + s1 + ".jpg", image);
 	// return boxarray_json;
 	// return success(boxarray_json);
-	return success(result_path);
+	return yoloDetectImage(session, "coco");
+	;
 }
 
 Json::Value LogicalController::detectMask(const Json::Value &param)
@@ -430,10 +451,10 @@ Json::Value LogicalController::detectMask(const Json::Value &param)
 
 	// Json::Value boxarray_json(Json::arrayValue);
 	// boxarray_json = yoloDetectImage(session, "mask");
-	string result_path = yoloDetectImage(session, "mask");
+	// string result_path = yoloDetectImage(session, "mask");
 
 	// return boxarray_json;
-	return success(result_path);
+	return yoloDetectImage(session, "mask");
 }
 
 Json::Value LogicalController::detectPerson(const Json::Value &param)
@@ -445,10 +466,10 @@ Json::Value LogicalController::detectPerson(const Json::Value &param)
 
 	// Json::Value boxarray_json(Json::arrayValue);
 	// boxarray_json = yoloDetectImage(session, "person");
-	string result_path = yoloDetectImage(session, "person");
+	// string result_path = yoloDetectImage(session, "person");
 
 	// return boxarray_json;
-	return success(result_path);
+	return yoloDetectImage(session, "person");
 }
 
 Json::Value LogicalController::detectBase64ImageH(const Json::Value &param)
@@ -547,6 +568,18 @@ Json::Value LogicalController::paddleOcr(const Json::Value &param)
 
 	auto image = cv::imread("./base_decode.jpg");
 
+	// string result_path ="";
+	// for (unsigned long long i = 0; i <= 18446744073709551615; i++)
+	// {
+	// 	result_path = "images/" + labels + to_string(i) + ".jpg";
+		
+	// 	if (access(result_path.c_str(), F_OK) != 0)
+	// 	{
+	// 		break;
+	// 	}
+	// }
+
+
 	// cv::imwrite("base_decode.jpg", image);
 	time_t curr_time;
 	time(&curr_time);
@@ -555,7 +588,7 @@ Json::Value LogicalController::paddleOcr(const Json::Value &param)
 	regex pattern2("\n");
 	string s1 = regex_replace(regex_replace(curr_time2, pattern1, "_"), pattern2, "");
 
-	string result_path = "images/paddleOcr/image" + s1 + ".jpg";
+	string result_path = "images/paddleOcr_image" + s1 + ".jpg";
 	cv::imwrite(result_path, image);
 
 	// cv::imwrite("base_decode.jpg", image);
