@@ -1,0 +1,334 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/workspace/pro"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"link_directories",
+			"target_link_libraries",
+			"cuda_add_library",
+			"include_directories",
+			"CUDA_ADD_CUDA_INCLUDE_ONCE"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt",
+			"/home/xd2/.local/lib/python3.6/site-packages/cmake/data/share/cmake-3.22/Modules/FindCUDA.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 54,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 41,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 60,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 52,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 1996,
+				"parent" : 4
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 57,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 58,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 31,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 1970,
+				"parent" : 4
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 1363,
+				"parent" : 9
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -std=c++11 -Wall -O0 -Wfatal-errors -pthread -w -g -g   -std=c++11"
+				},
+				{
+					"fragment" : "-std=gnu++11"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 8,
+					"path" : "/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/src"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/data/sxai/lean/cuda-10.2/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/data/sxai/lean/TensorRT-8.0.1.6-cuda10.2-cudnn8.2/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/data/sxai/lean/cudnn8.2.2.26/include"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/usr/local/cuda111/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "11"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g   -std=c++11"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 8,
+					"path" : "/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/src"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/data/sxai/lean/cuda-10.2/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/data/sxai/lean/TensorRT-8.0.1.6-cuda10.2-cudnn8.2/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/data/sxai/lean/cudnn8.2.2.26/include"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/usr/local/cuda111/include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				6
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "cucodes::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "pro::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-std=c++11 -Wall -O0 -Wfatal-errors -pthread -w -g -g",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-rdynamic",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-L/data/sxai/lean/TensorRT-8.0.1.6-cuda10.2-cudnn8.2/lib",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-L/data/sxai/lean/cuda-10.2/lib64",
+				"role" : "libraryPath"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-L/data/sxai/lean/cudnn8.2.2.26/lib",
+				"role" : "libraryPath"
+			},
+			{
+				"fragment" : "-Wl,-rpath,/data/sxai/lean/TensorRT-8.0.1.6-cuda10.2-cudnn8.2/lib:/data/sxai/lean/cuda-10.2/lib64:/data/sxai/lean/cudnn8.2.2.26/lib:/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/build:/usr/local/cuda111/lib64",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "libcucodes.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "/usr/local/cuda111/lib64/libcudart.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "-lnvinfer",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "-lnvonnxparser",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "-lcuda",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "-lcublas",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "-lcudart",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 7,
+				"fragment" : "-lcudnn",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "pro",
+	"nameOnDisk" : "pro",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/http/binary_io.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/http/http_server.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/http/ilogger.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/http/json.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/import_lib.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/main.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "src/http/mongoose.c",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

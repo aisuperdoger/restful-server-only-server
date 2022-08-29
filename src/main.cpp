@@ -180,36 +180,34 @@ Json::Value LogicalController::yoloDetectImage(std::shared_ptr<Session> session,
 	// i1 = body.find("\r\n");
 	// i1 = body.find("\r\n", i1 + 2);
 	// i1 = body.find("\r\n", i1 + 2);
-	i1 = body.find("\r\n\r\n") + 4;  // 这是个bug，如果发送过来的信息，不是这个格式就识别不了，甚至导致程序崩溃
-	if(i1==0){
+	i1 = body.find("\r\n\r\n") + 4; // 这是个bug，如果发送过来的信息，不是这个格式就识别不了，甚至导致程序崩溃
+	if (i1 == 0)
+	{
 		// INFOE("请检查发送格式或发送内容是否正确");
 		return failure("请检查发送格式或发送内容是否正确");
 	}
-	
-	
+
 	// std::cout<<body.substr(i1,1000)<<std::endl;
 
-	string result_path ="";
+	string result_path = "";
 	for (unsigned long long i = 0; i <= 18446744073709551615; i++)
 	{
 		result_path = "images/" + labels + to_string(i) + ".jpg";
-		
+
 		if (access(result_path.c_str(), F_OK) != 0)
 		{
 			break;
 		}
 	}
 
-
 	iLogger::save_file(result_path, session->request.body.substr(i1)); // 保存图片
-	
-	
-	auto image = cv::imread(result_path); 
+
+	auto image = cv::imread(result_path);
 
 	SimpleYolo::BoxArray boxarray;
 	if (!this->infer_instance_->inference(image, boxarray))
 		return failure("Server error1");
-		// return "Server error1";
+	// return "Server error1";
 
 	const char **target_labels = nullptr;
 	if (labels == "person")
@@ -259,8 +257,6 @@ Json::Value LogicalController::yoloDetectImage(std::shared_ptr<Session> session,
 
 	// cv::imwrite("base_decode.jpg", image);
 
-
-	
 	cv::imwrite(result_path, image);
 
 	// cv::imwrite("base_decode.jpg", image);
@@ -572,13 +568,12 @@ Json::Value LogicalController::paddleOcr(const Json::Value &param)
 	// for (unsigned long long i = 0; i <= 18446744073709551615; i++)
 	// {
 	// 	result_path = "images/" + labels + to_string(i) + ".jpg";
-		
+
 	// 	if (access(result_path.c_str(), F_OK) != 0)
 	// 	{
 	// 		break;
 	// 	}
 	// }
-
 
 	// cv::imwrite("base_decode.jpg", image);
 	time_t curr_time;
@@ -594,7 +589,8 @@ Json::Value LogicalController::paddleOcr(const Json::Value &param)
 	// cv::imwrite("base_decode.jpg", image);
 	// return "http://127.0.0.1:8090/static/" + result_path;
 
-	return success("http://test1980images.vaiwan.com/static/" + result_path);
+	// return success("http://test1980images.vaiwan.com/static/" + result_path);
+	return success("http://127.0.0.1:8090/static/" + result_path);
 }
 
 Json::Value LogicalController::yolov5_classify_life_jacket(const Json::Value &param)
@@ -645,13 +641,16 @@ Json::Value LogicalController::yolov5_classify_life_jacket(const Json::Value &pa
 	regex pattern2("\n");
 	string s1 = regex_replace(regex_replace(curr_time2, pattern1, "_"), pattern2, "");
 
-	string result_path = "images/paddleOcr/image" + s1 + ".jpg";
+	string result_path = "images/paddleOcr_image" + s1 + ".jpg";
 	cv::imwrite(result_path, image);
 
 	// cv::imwrite("base_decode.jpg", image);
 	// return "http://127.0.0.1:8090/static/" + result_path;
 
-	return success("http://test1980images.vaiwan.com/static/" + result_path);
+	// return success(result_path);
+	//return success("http://127.0.0.1:8090/static/" + result_path);
+
+	 return success("http://127.0.0.1:8090/static/" + result_path);
 }
 
 Json::Value LogicalController::getCustom(const Json::Value &param)
