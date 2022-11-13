@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "../workspace/pro"
-  "../workspace/pro.pdb"
+  "/home/ubuntu/projects/restful-server/workspace/pro"
+  "/home/ubuntu/projects/restful-server/workspace/pro.pdb"
   "CMakeFiles/pro.dir/src/http/binary_io.cpp.o"
   "CMakeFiles/pro.dir/src/http/binary_io.cpp.o.d"
   "CMakeFiles/pro.dir/src/http/http_server.cpp.o"

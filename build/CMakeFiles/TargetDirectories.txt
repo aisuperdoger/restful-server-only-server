@@ -1,5 +1,4 @@
-/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/build/CMakeFiles/cucodes.dir
-/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/build/CMakeFiles/pro.dir
-/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/build/CMakeFiles/run.dir
-/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/build/CMakeFiles/edit_cache.dir
-/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/build/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/projects/restful-server/build/CMakeFiles/pro.dir
+/home/ubuntu/projects/restful-server/build/CMakeFiles/run.dir
+/home/ubuntu/projects/restful-server/build/CMakeFiles/edit_cache.dir
+/home/ubuntu/projects/restful-server/build/CMakeFiles/rebuild_cache.dir

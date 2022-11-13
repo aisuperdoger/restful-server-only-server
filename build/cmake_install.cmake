@@ -1,4 +1,4 @@
-# Install script for directory: /home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server
+# Install script for directory: /home/ubuntu/projects/restful-server
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/xd2/hhx2022/projects/trt/tensorrt-integrate/restful-server/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ubuntu/projects/restful-server/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
