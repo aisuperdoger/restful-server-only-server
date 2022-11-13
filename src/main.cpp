@@ -32,4 +32,6 @@ int main(int argc, char** argv) {
 
     // 添加静态文件访问，对于路由/static，绑定到路径./上
     server->add_controller("/static", create_file_access_controller("./"));     
+    
+    return iLogger::while_loop();
 }
