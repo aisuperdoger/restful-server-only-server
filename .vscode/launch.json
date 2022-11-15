@@ -1,30 +1,37 @@
 {
-    // 使用 IntelliSense 了解相关属性。 
-    // 悬停以查看现有属性的描述。
-    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) 启动",
+            "name": "g++ - Build and debug active file",  // 名字随便取
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/workspace/pro",
-            "args": [
-                "yolo"
-            ],
+            // program 指定调试那个可执行文件，需要绝对路径
+            // ${fileDirname} 当前打开的文件所在的绝对路径，不包括文件名
+            // ${fileBasenameNoExtension} 当前打开的文件的文件名，不包括路径和后缀名
+            "program": "${workspaceFolder}/workspace/pro", 
+            "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/workspace",
+            "cwd": "${workspaceFolder}/workspace/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
-                    "description": "为 gdb 启用整齐打印",
+                    "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build"
+            "preLaunchTask": "C/C++: g++ build active file",  // 在执行lanuch.json之前要做的任务
+            "miDebuggerPath": "/bin/gdb"        // 指定调试工具
         }
     ]
 }

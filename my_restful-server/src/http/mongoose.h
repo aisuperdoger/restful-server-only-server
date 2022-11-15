@@ -3716,7 +3716,7 @@ int mg_mgr_poll(struct mg_mgr *mgr, int milli);
  * by `MG_CTL_MSG_MESSAGE_SIZE` which is set to 8192 bytes by default.
  */
 void mg_broadcast(struct mg_mgr *mgr, mg_event_handler_t cb, void *data,
-                  size_t len); //  data有大小限制8192 bytes
+                  size_t len);
 #endif
 
 /*

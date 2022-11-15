@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(pro)
 
-
-set(CMAKE_CXX_STANDARD 14)
+option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE Debug)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/workspace)
 

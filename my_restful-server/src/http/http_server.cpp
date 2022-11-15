@@ -579,7 +579,7 @@ void Controller::process(const shared_ptr<Session>& session){
 }
 
 void Controller::process_module(const shared_ptr<Session>& session, const ControllerProcess& func){
-	auto param = Json::parse_string(session->request.body); // 将body解析为json格式，存入 param
+	auto param = Json::parse_string(session->request.body);
 	auto tid = this_thread::get_id();
 	{
 		unique_lock<mutex> l(this->session_lock_);
@@ -805,7 +805,7 @@ shared_ptr<Controller> create_file_access_controller(const string& root_director
 	return make_shared<FileAccessController>(root_directory);
 }
 
- class HttpServerImpl : public HttpServer
+class HttpServerImpl : public HttpServer
 {
 public:
 	virtual ~HttpServerImpl(){
@@ -835,7 +835,6 @@ public:
 
 private:
 	unordered_map<string, unordered_map<string, Handler>> router_map_; 		// 什么链接对应什么处理函数。第一个string代表链接，第二个string代表请求类型（GET、POST），Handler代表处理函数
-																		    // Handler本质就是一个函数指针（std::function）
 	vector<tuple<string, Handler>> begin_match_router_;		// etc, static file access
 
 private:
@@ -912,7 +911,7 @@ void HttpServerImpl::on_work_complete(struct mg_connection *nc, int ev, void *ev
  
 void HttpServerImpl::worker_thread_proc() {
 
-	while (keeprun_) {  // 只有线程被删除，keeprun_才会编程false
+	while (keeprun_) {
 		shared_ptr<Session> session;
 		{
 			unique_lock<mutex> l(lck_);
@@ -969,19 +968,19 @@ void HttpServerImpl::worker_thread_proc() {
 		if (!found_router){
 			error_process(session, 404);
 		}
-		mg_broadcast(&mgr_, on_work_complete, &result, sizeof(result)); // 将给定长度的消息传递给所有连接。发给所有链接干嘛？？
+		mg_broadcast(&mgr_, on_work_complete, &result, sizeof(result));
 	}
 }
 
 // 绑定事件，开启监听。初始化一些不知道用来干嘛的线程？
 bool HttpServerImpl::start(const string& address, int num_threads)
 {
-	this->close(); // 等待所有线程运行完毕，关闭所有线程和清空必要数据。
+	this->close();
 
 	//signal(SIGTERM, SIG_IGN);
   	//signal(SIGINT, SIG_IGN);
 	mg_mgr_init(&mgr_, nullptr);    	// mg_开头的函数基本都是mongoose中的函数，具体可参见https://www.cnblogs.com/codingbigdog/p/16271138.html
-	mgr_.user_data = this; 		    	// user_data是一个void指针。this指针指向的空间中保存的只有成员变量。
+	mgr_.user_data = this; 		    	// user_data是一个void指针
 	mg_connection *connection = mg_bind(&mgr_, address.c_str(), HttpServerImpl::on_http_event); // 当事件发生了自动调用on_http_event。如request来到了
 	if (connection == nullptr){
 		INFOE("bind %s fail", address.c_str());
@@ -999,11 +998,10 @@ bool HttpServerImpl::start(const string& address, int num_threads)
 																							// 发送数据的语句在worker_thread_proc中。
 																							// worker_thread_proc作用：
 
-	// 对favicon处理，网页图标
+	// 对favicon处理
 	this->add_router_get("/favicon.ico", [](const std::shared_ptr<Session>& session){
-		session->response.write_file("favicon.jpg"); // 这里设置的回调函数，这里是匿名回调函数。
-													 // 当访问/favicon.ico时，回调函数中调用了wirite_file将favicon.jpg文件所在的路径设置到session的reponse中。
-													 // 浏览器中输入http://127.0.0.1:8090/favicon.ico，即可访问
+		session->response.write_file("favicon.jpg"); // 当访问/favicon.ico，使用wirite_file发送文件给客户端。write_file中只设置了需要返回的是哪个文件
+													//真正发送不是通过write_file。那真正发送图片的代码在哪？
 	});
 	return true;
 }
@@ -1021,14 +1019,14 @@ void HttpServerImpl::loop(){
 void HttpServerImpl::commit(shared_ptr<Session> user){
 	{
 		unique_lock<mutex> l(lck_);
-		jobs_.push(user); // 将user添加到session队列jobs中
+		jobs_.push(user);
 	};
-	cv_.notify_one(); // 唤醒线程处理此session
+	cv_.notify_one();
 }
 
 void HttpServerImpl::on_http_event(mg_connection *connection, int event_type, void *event_data){  // 用于处理http request和close
 
-	HttpServerImpl* server = (HttpServerImpl*)connection->mgr->user_data; // server代表的就是this，但是不知道在回调函数on_http_event中能不能互相替换？？
+	HttpServerImpl* server = (HttpServerImpl*)connection->mgr->user_data; // server代表的就是this，但是不知道在回调函数on_http_event中能不能互相替换
  
 	switch (event_type) {
 	case MG_EV_ACCEPT:{
@@ -1039,21 +1037,20 @@ void HttpServerImpl::on_http_event(mg_connection *connection, int event_type, vo
 
 	case MG_EV_HTTP_REQUEST: {
 		http_message *http_req = (http_message *)event_data; // event_data如何被发送过来，为什么直接将http_req给初始化了
-		connection->user_data = (void*)++server->s_next_id_;  // s_next_id_为SessionID，SessionID随着http连接的变多，而逐渐升高。但是从后面的代码可以看出：被处理掉一个session以后，sessionid并没有减一
+		connection->user_data = (void*)++server->s_next_id_;
 		SessionID id = (SessionID)connection->user_data;
-		auto user = server->session_manager_.emplace_create(id); 	// 向session管理器中添加一个会话，并返回此会话。session管理器的核心就是一个“id到session的映射”
+		auto user = server->session_manager_.emplace_create(id); 	// 添加一个会话，并返回此会话
 		user->request.url = string(http_req->uri.p, http_req->uri.len); // 从http_req->uri.p开始取出len个字符
-		user->request.body = string(http_req->body.p, http_req->body.len); // http请求包括请求行（request line）、请求头部（header）、空行和请求数据四个部分组成。body就是请求数据
-		user->request.query_string = string(http_req->query_string.p, http_req->query_string.len); // 如http://10.50.4.227:8090/favicon.ico?pretty=true中，问号以后的就是query
-		user->request.method = string(http_req->method.p, http_req->method.len); // 如GET，POST
-		user->request.proto = string(http_req->proto.p, http_req->proto.len); // 如"HTTP/1.1"
-		parse_uri_vars(user->request.query_string, user->request.vars);  // 解析问号以后的东西
+		user->request.body = string(http_req->body.p, http_req->body.len);
+		user->request.query_string = string(http_req->query_string.p, http_req->query_string.len);
+		user->request.method = string(http_req->method.p, http_req->method.len);
+		user->request.proto = string(http_req->proto.p, http_req->proto.len);
+		parse_uri_vars(user->request.query_string, user->request.vars);
 
-		if(!user->request.url.empty() && user->request.url.back() != '/' || user->request.url.empty()) // 要求url必须以"/"结尾
+		if(!user->request.url.empty() && user->request.url.back() != '/' || user->request.url.empty())
 			user->request.url.push_back('/');
 
 		int i = 0;
-		//  http请求包括请求行（request line）、请求头部（header）、空行和请求数据四个部分组成。header_names就是请求头
 		while(http_req->header_names[i].len > 0 && i < MG_MAX_HTTP_HEADERS){
 			auto& name = http_req->header_names[i];
 			auto& value = http_req->header_values[i];
@@ -1065,9 +1062,9 @@ void HttpServerImpl::on_http_event(mg_connection *connection, int event_type, vo
 	}
 
 	case MG_EV_CLOSE: 
-		if (connection->user_data){ // 为什么这里的user_data就是sessionid？？
+		if (connection->user_data){
 			SessionID id = (SessionID)connection->user_data;
-			server->session_manager_.remove(id); // 移除某个session。这里是不是有个bug，sessionid 会越来越大
+			server->session_manager_.remove(id);
 		}
 	}
 }
@@ -1108,8 +1105,8 @@ void HttpServerImpl::close()
 	if(keeprun_){
 		INFO("Shutdown http server.");
 		keeprun_ = false;
-		cv_.notify_all(); 		// notify_all()：所有线程被一个一个唤醒，先抢到锁的先唤醒
-		loop_thread_->join(); // 本线程等待线程loop_thread_执行完毕。loop_thread_线程用于等待用户请求，核心只有一句话：mg_mgr_poll(&mgr_, 1000);
+		cv_.notify_all(); 	// notify_all()：会唤醒所有等待队列中阻塞的线程，存在锁争用，只有一个线程能够获得锁。
+		loop_thread_->join(); // 本线程等待线程loop_thread_执行完毕
 
 		for(auto& t : threads_)
 			t->join();			// 本线程等待线程t执行完毕
@@ -1125,15 +1122,7 @@ shared_ptr<HttpServer> createHttpServer(const string& address, int num_threads){
 	shared_ptr<HttpServerImpl> ins(new HttpServerImpl());
 	if(!ins->start(address, num_threads))
 		ins.reset();
-	return ins;			 // 1.createHttpServer中创建的对象不应该在栈中吗？出了函数不应该就被删除了吗？
-						 // 答：new是在堆上分配空间的，所以出了函数不一定被删除。
-						 // 这里shared_ptr被创建时，引用计数为1。按值返回以后，引用计数为2。函数执行完成，引用计数减少一，变为1
-						 // 本函数中使用按值返回以后shared_ptr作为返回值似乎不是很有效率的做法，我认为将代码改成如下形式效率更高
-	//  HttpServerImpl ins;
-	// if(!ins.start(address, num_threads))
-	// 	ins.reset(); // 这一行，我不知道改成什么
-	// return ins;	
-
+	return ins; // 返回的是个HttpServerImpl对象，这个对象里有啥呢？
 }
 
 Json::Value success(){
