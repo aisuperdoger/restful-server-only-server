@@ -9,6 +9,7 @@
 #include "mongoose.h"
 #include <future>
 #include <condition_variable>
+#include <iostream>
 
 using namespace std;
 
@@ -579,7 +580,46 @@ void Controller::process(const shared_ptr<Session>& session){
 }
 
 void Controller::process_module(const shared_ptr<Session>& session, const ControllerProcess& func){
-	auto param = Json::parse_string(session->request.body); // 将body解析为json格式，存入 param
+
+	Json::Value param;
+	// 解析multipart/form-data格式数据
+	if (!(session->request.headers.find("Content-Type") == session->request.headers.end())  	// 代表头部信息中是否有Content-Type字段
+		&& session->request.headers["Content-Type"].find("multipart/form-data;", 0) >= 0 )
+    {
+		std::string pattern ="boundary=";
+		int i = session->request.headers["Content-Type"].find("; "+pattern, 0); 
+		i+=pattern.size()+2;
+		std::string boundary = session->request.headers["Content-Type"].substr(i);
+		std::shared_ptr<std::string> sptr_data(new std::string(session->request.body));
+
+		// std::cout << session->request.body.substr(0,1000)<<std::endl;
+
+		FormDataParser fdp(sptr_data,0,"--"+boundary);
+		auto p = fdp.parse();
+
+		for (std::vector<FormItem>::iterator it = p->begin(); it != p->end();++it) {
+			if((*(it)).getFileName()!=""){ // 如果文件名不为空，那么说明是个文件，那么就存储为test.zip
+				iLogger::save_file("test.zip",  (*(it)).getContent());
+				param["filename"] = "test.zip";
+			}
+			else{ 
+				param[(*(it)).getName()] = (*(it)).getContent();
+			}	
+
+			// std::cout << (*(it)).getName() <<std::endl; //<< (*(it)).getContent() <<std::endl;
+		}
+		// std::cout<<  session->request.headers["Content-Type"] << "j=" << boundary << std::endl;
+
+		// 查看解析结果是否正确
+		// for (std::vector<FormItem>::iterator it = p->begin(); it != p->end();++it) {
+		// 	std::cout << (*(it)).getName() <<std::endl; //<< (*(it)).getContent() <<std::endl;
+		// }
+		// std::cout<<  session->request.headers["Content-Type"] << "j=" << boundary << std::endl;
+	}
+	else{ // 解析json格式数据
+		auto param = Json::parse_string(session->request.body); // 将body解析为json格式，存入 param
+	}
+	
 	auto tid = this_thread::get_id();
 	{
 		unique_lock<mutex> l(this->session_lock_);
@@ -596,6 +636,7 @@ void Controller::process_module(const shared_ptr<Session>& session, const Contro
 		unique_lock<mutex> l(this->session_lock_);
 		this->current_session_.erase(tid);
 	};
+
 }
 
 Controller::ControllerProcess Controller::find_match(const string& url, const string& method){

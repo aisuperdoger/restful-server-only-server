@@ -6,6 +6,7 @@
 #include "ilogger.hpp"
 #include "binary_io.hpp"
 #include "json.hpp"
+#include"FormDataParser.h"
 #include <string>
 #include <memory>
 #include <functional>
@@ -72,7 +73,7 @@ struct Session {
 typedef std::function<void(const std::shared_ptr<Session>& session)> HandlerCallback;
 #define DefRequestMapping(name)  																			\
 	int __##name##_register__{add_router(#name, "*", std::bind(&__Current_Class__::name, this, std::placeholders::_1))};	\
-	Json::Value name(const Json::Value& param)
+	Json::Value name(const Json::Value& param) // __##name##_register__是什么东西？答：这里就是定义了名字为__##name##_register__的函数。
 
 #define SetupController(classes)	using __Current_Class__ = classes;
 
