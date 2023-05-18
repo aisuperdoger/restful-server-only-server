@@ -6,7 +6,7 @@
 mkdir build
 cd build
 cmake ..
-make
+make -j4
 cd ../workspace
 ./pro
 ```

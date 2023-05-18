@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "g++ - Build and debug active file",  // 名字随便取
+            "name": "g++ - Build and debug active file", // 名字随便取
             "type": "cppdbg",
             "request": "launch",
             // program 指定调试那个可执行文件，需要绝对路径
             // ${fileDirname} 当前打开的文件所在的绝对路径，不包括文件名
             // ${fileBasenameNoExtension} 当前打开的文件的文件名，不包括路径和后缀名
-            "program": "${workspaceFolder}/workspace/pro", 
+            "program": "${workspaceFolder}/workspace/pro",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/workspace/",
@@ -30,8 +30,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "C/C++: g++ build active file",  // 在执行lanuch.json之前要做的任务
-            "miDebuggerPath": "/bin/gdb"        // 指定调试工具
+            // "preLaunchTask": "C/C++: g++ build active file", // 在执行lanuch.json之前要做的任务
+            "miDebuggerPath": "/usr/bin/gdb" // 指定调试工具
         }
     ]
 }

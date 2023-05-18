@@ -15,7 +15,8 @@ include_directories(
 )
 
 
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}  -Wall -O0 -Wfatal-errors -pthread -w -g")
+# set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}  -Wall -O0 -Wfatal-errors -pthread -w -g") # 编译时进行优化，这样不利于调试
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}  -Wall  -Wfatal-errors -pthread -w -g")
 file(GLOB_RECURSE cpp_srcs ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE c_srcs ${PROJECT_SOURCE_DIR}/src/*.c)
 
